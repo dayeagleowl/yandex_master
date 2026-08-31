@@ -1,0 +1,12 @@
+# история версий TD — в git идёт только канонический master_project_v1.toe
+Backup/
+master_project_v1.[0-9]*.toe
+TDImportCache/
+CrashReports/
+*.dmp
+
+# тяжёлые записи тестов — передаются папкой, не через git
+recordings/
+
+.DS_Store
+_tdparse*/
