@@ -1,8 +1,8 @@
 name: Протокол
 
-# Каждый пуш и каждый PR: проверяем, что контракт не сломан, и пересобираем
-# Word-версию спеки. Так документ, который уезжает подрядчикам, всегда
-# соответствует protocol.json — никто не забудет пересобрать вручную.
+# Каждый пуш, задевший контракт: проверяем, что protocol.json цел, и
+# пересобираем Word-версию спеки — чтобы документ для подрядчиков не
+# расходился с проектом, даже если его забыли пересобрать руками.
 
 on:
   push:
@@ -24,26 +24,39 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: protocol.json — валидный JSON и полный контракт
+      - name: protocol.json — валидный и полный
         run: |
           python3 - <<'PY'
-          import json, sys
+          import json
           d = json.load(open('protocol.json', encoding='utf-8'))
-          need = ['network', 'geometry', 'session_model', 'messages', 'sequence']
-          missing = [k for k in need if k not in d]
-          assert not missing, f'нет разделов: {missing}'
-          for direction, msgs in d['messages'].items():
+
+          for key in ['ports', 'hosts', 'tunnel', 'rules',
+                      'master_to_zones', 'master_to_panel',
+                      'zones_to_master', 'panel_to_master']:
+              assert key in d, f'нет раздела {key}'
+
+          for host in ['master', 'zone1', 'zone2', 'zone3', 'zone4', 'panel']:
+              assert host in d['hosts'], f'нет адреса {host}'
+          for port in ['zone_listens', 'master_from_panel', 'master_from_zones', 'panel_listens']:
+              assert isinstance(d['ports'].get(port), int), f'порт {port} не число'
+
+          zones = d['tunnel']['zones']
+          assert zones, 'нет зон'
+          for z in zones:
+              assert len(z['x']) == 2 and len(z['y']) == 2, f'зона {z} без границ'
+              assert z['x'][0] < z['x'][1], f'зона {z["zone"]}: xmin >= xmax'
+
+          total = 0
+          for direction in ['master_to_zones', 'master_to_panel', 'zones_to_master', 'panel_to_master']:
+              msgs = d[direction]
               assert msgs, f'{direction}: пусто'
               for m in msgs:
-                  assert 'address' in m and 'args' in m, f'{direction}: сообщение без address/args: {m}'
-                  for a in m['args']:
-                      assert 'name' in a and 'type' in a, f"{m['address']}: аргумент без name/type: {a}"
-          hosts = d['network']['hosts']
-          for h in ['master', 'zone1', 'zone2', 'zone3', 'zone4', 'touchpanel']:
-              assert h in hosts, f'нет хоста {h}'
-          print('protocol.json в порядке:',
-                sum(len(v) for v in d['messages'].values()), 'сообщений,',
-                len(d['geometry']['zones']), 'зон, обновлён', d['updated'])
+                  assert m.get('addr', '').startswith('/'), f'{direction}: адрес не начинается со слэша: {m}'
+                  assert 'args' in m, f'{m["addr"]}: нет args'
+              total += len(msgs)
+
+          print(f'protocol.json v{d["version"]} в порядке: {total} сообщений, '
+                f'{len(zones)} зон, обновлён {d["updated"]}')
           PY
 
       - uses: actions/setup-node@v4

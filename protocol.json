@@ -1,604 +1,214 @@
 {
-  "_": "Единый контракт инсталляции: что мастер шлёт на компы зон и панель и что принимает от них. Машиночитаемая пара к docs/PROTOCOL.md. Источник истины — код мастера (show_control/ext_showcontrol, osc_dispatch/ext_oscdispatch); этот файл сверен с ним и обновляется вместе.",
-  "version": "1.0",
+  "about": "Контракт инсталляции: что мастер шлёт зонам и панели и что принимает от них. Всё OSC поверх UDP. Словами то же самое — docs/PROTOCOL.md. Числа обновляются из проекта кнопкой ЭКСПОРТ JSON в пульте.",
+  "version": "2.0",
   "updated": "2026-08-31",
-  "project": "master_project_v1",
-  "transport": "OSC over UDP",
-  "network": {
-    "_": "IP по техсхеме docs/26_08_yandex_Tech_DE.pdf. Адреса зон и панели правятся в таблице osc_dispatch/slaves, порты приёма — пары Panelport и Zonesport на show_control.",
-    "hosts": {
-      "master": {
-        "ip": "10.10.10.10",
-        "listens": {
-          "from_panel": 6001,
-          "from_zones": 6002,
-          "blacktrax_rttrpm": 24002
-        }
-      },
-      "zone1": {
-        "ip": "10.10.10.11",
-        "listens": {
-          "from_master": 6000
-        },
-        "role": "вход, справа"
-      },
-      "zone2": {
-        "ip": "10.10.10.12",
-        "listens": {
-          "from_master": 6000
-        }
-      },
-      "zone3": {
-        "ip": "10.10.10.13",
-        "listens": {
-          "from_master": 6000
-        }
-      },
-      "zone4": {
-        "ip": "10.10.10.14",
-        "listens": {
-          "from_master": 6000
-        },
-        "role": "выход, слева"
-      },
-      "touchpanel": {
-        "ip": "10.10.10.15",
-        "listens": {
-          "from_master": 6003
-        }
-      },
-      "blacktrax": {
-        "ip": "10.10.10.16",
-        "sends_to": "master:24002",
-        "note": "RTTrPM, не OSC"
-      }
-    },
-    "outside_master": {
-      "_": "Есть на схеме, но мастером не управляется",
-      "artnet": {
-        "artgate": "2.0.0.14",
-        "artnet_spi": "2.0.0.12"
-      },
-      "sensors": [
-        "10.10.10.17",
-        "10.10.10.18",
-        "10.10.10.19"
-      ],
-      "engravers": [
-        "10.10.10.20",
-        "10.10.10.21"
-      ],
-      "note": "сенсоры и гравёры ходят через зонный сервер 4 мимо мастера"
-    }
+  "ports": {
+    "zone_listens": 6000,
+    "master_from_panel": 6001,
+    "master_from_zones": 6002,
+    "panel_listens": 6003,
+    "master_blacktrax": 24002
   },
-  "geometry": {
-    "_": "Тоннель. Ось x — длина, ось y — ширина. Движение СПРАВА НАЛЕВО: гости входят при больших x.",
-    "tunnel_length_m": 15.0,
-    "tunnel_width_m": 3.0,
-    "flow": "right_to_left",
+  "hosts": {
+    "master": "10.10.10.10",
+    "zone1": "10.10.10.11",
+    "zone2": "10.10.10.12",
+    "zone3": "10.10.10.13",
+    "zone4": "10.10.10.14",
+    "panel": "10.10.10.15",
+    "blacktrax": "10.10.10.16"
+  },
+  "tunnel": {
+    "length_m": 15.0,
+    "width_m": 3.0,
+    "flow": "справа налево: зона 1 — вход, зона 4 — выход",
     "zones": [
       {
         "zone": 1,
-        "xmin": 11.25,
-        "xmax": 15.0,
-        "ymin": 0.0,
-        "ymax": 3.0,
-        "role": "вход"
+        "x": [
+          11.25,
+          15.0
+        ],
+        "y": [
+          0.0,
+          3.0
+        ]
       },
       {
         "zone": 2,
-        "xmin": 7.5,
-        "xmax": 11.25,
-        "ymin": 0.0,
-        "ymax": 3.0
+        "x": [
+          7.5,
+          11.25
+        ],
+        "y": [
+          0.0,
+          3.0
+        ]
       },
       {
         "zone": 3,
-        "xmin": 3.75,
-        "xmax": 7.5,
-        "ymin": 0.0,
-        "ymax": 3.0
+        "x": [
+          3.75,
+          7.5
+        ],
+        "y": [
+          0.0,
+          3.0
+        ]
       },
       {
         "zone": 4,
-        "xmin": 0.0,
-        "xmax": 3.75,
-        "ymin": 0.0,
-        "ymax": 3.0,
-        "role": "выход"
-      }
-    ],
-    "editable_in": "zones/zones_table (пары Tunnellength/Tunnelwidth + пульс Equalsplit пересобирают поровну; дальше можно править руками)"
-  },
-  "session_model": {
-    "_": "В тоннеле одновременно до Maxactive групп (2). Промпт привязан к гостю 1..3 ВНУТРИ группы, трекинг знает только физический бикон — поэтому мастер держит привязку бикон -> (номер сессии, гость) и ставит номер сессии в адрес сообщений.",
-    "session_num": "сквозной счётчик мастера, для людей, логов и адресации",
-    "session_uuid": "приходит с панели, для сверки",
-    "guest_index": "1..3 внутри группы",
-    "beacon": "физический BlackTrax ID (1..12)",
-    "max_active_groups": 2,
-    "assign_modes": {
-      "auto": "первый вошедший в зону входа — гость 1, второй — гость 2 и т.д.",
-      "pool": "биконы закреплены за слотами (таблица beacon_pools), слоты чередуются между группами; гость = позиция бикона в своём пуле",
-      "manual": "оператор назначает в пульте"
-    },
-    "session_close": "все биконы группы вне зон дольше Exitgrace (8 с) -> /show/session/end, биконы освобождаются",
-    "force_mode": {
-      "_": "Ручка оператора: команды зонам уходят с force=1 — зона обязана немедленно прервать текущее состояние и выполнить команду с нуля, игнорируя свои блокировки и отсутствие сессии. Нужен на прогонах и когда зона зависла.",
-      "par": "Forcemode на show_control (тумблер ПРИНУДИТЕЛЬНО в пульте)",
-      "applies_to": [
-        "/zone{N}/start",
-        "/zone{N}/restart",
-        "/zone{N}/reset"
-      ],
-      "all_zones": "кнопки ВСЕ: СТАРТ / ВСЕ: РЕСТАРТ / ВСЕ: СБРОС шлют команду каждой зоне из таблицы slaves"
-    }
-  },
-  "messages": {
-    "master_to_zones": [
-      {
-        "address": "/show/clock",
-        "args": [
-          {
-            "name": "seconds",
-            "type": "float",
-            "desc": "часы шоу от старта"
-          }
+        "x": [
+          0.0,
+          3.75
         ],
-        "rate_hz": 30,
-        "desc": "общий тайминг всем зонам"
-      },
-      {
-        "address": "/show/state",
-        "args": [
-          {
-            "name": "state",
-            "type": "string",
-            "enum": [
-              "standby",
-              "running",
-              "finished"
-            ]
-          }
-        ],
-        "when": "при смене состояния"
-      },
-      {
-        "address": "/show/reset",
-        "args": [
-          {
-            "name": "flag",
-            "type": "int",
-            "const": 1
-          }
-        ],
-        "when": "оператор: СБРОС ВСЕГО"
-      },
-      {
-        "address": "/show/finish",
-        "args": [
-          {
-            "name": "flag",
-            "type": "int",
-            "const": 1
-          }
-        ],
-        "when": "оператор: FINISH"
-      },
-      {
-        "address": "/show/ping",
-        "args": [
-          {
-            "name": "flag",
-            "type": "int",
-            "const": 1
-          }
-        ],
-        "when": "проверка связи"
-      },
-      {
-        "address": "/show/session/start",
-        "args": [
-          {
-            "name": "num",
-            "type": "int",
-            "desc": "номер сессии"
-          },
-          {
-            "name": "uuid",
-            "type": "string"
-          },
-          {
-            "name": "guests",
-            "type": "int",
-            "desc": "сколько человек в группе"
-          }
-        ],
-        "when": "группа заведена в реестр; ПОВТОРЯЕТСЯ при каждой правке привязок",
-        "desc": "объявление группы; следом идут session/prompt на каждого гостя"
-      },
-      {
-        "address": "/show/session/prompt",
-        "args": [
-          {
-            "name": "num",
-            "type": "int"
-          },
-          {
-            "name": "guest",
-            "type": "int",
-            "desc": "1..3 внутри группы"
-          },
-          {
-            "name": "beacon",
-            "type": "int",
-            "desc": "физический BlackTrax ID"
-          },
-          {
-            "name": "promptid",
-            "type": "int",
-            "desc": "сквозной номер промпта 1..40"
-          },
-          {
-            "name": "topicid",
-            "type": "int"
-          },
-          {
-            "name": "text",
-            "type": "string"
-          }
-        ],
-        "desc": "чей промпт: гость группы -> текст"
-      },
-      {
-        "address": "/show/session/end",
-        "args": [
-          {
-            "name": "num",
-            "type": "int"
-          }
-        ],
-        "desc": "группа вышла из тоннеля, номер можно забыть"
-      },
-      {
-        "address": "/zone{N}/start",
-        "args": [
-          {
-            "name": "uuid",
-            "type": "string"
-          },
-          {
-            "name": "force",
-            "type": "int",
-            "enum": [
-              0,
-              1
-            ],
-            "desc": "0 = штатно (зона запускается по своей логике); 1 = ПРИНУДИТЕЛЬНО: немедленно прервать текущее состояние и выполнить с нуля, игнорируя внутренние блокировки и отсутствие сессии"
-          }
-        ],
-        "desc": "запуск сцены зоны N Последний аргумент — флаг принудительного режима.",
-        "also": "та же команда может прийти всем зонам сразу (кнопки ВСЕ: СТАРТ / РЕСТАРТ / СБРОС в пульте)"
-      },
-      {
-        "address": "/zone{N}/restart",
-        "args": [
-          {
-            "name": "uuid",
-            "type": "string"
-          },
-          {
-            "name": "force",
-            "type": "int",
-            "enum": [
-              0,
-              1
-            ],
-            "desc": "0 = штатно (зона запускается по своей логике); 1 = ПРИНУДИТЕЛЬНО: немедленно прервать текущее состояние и выполнить с нуля, игнорируя внутренние блокировки и отсутствие сессии"
-          }
-        ],
-        "desc": "Последний аргумент — флаг принудительного режима.",
-        "also": "та же команда может прийти всем зонам сразу (кнопки ВСЕ: СТАРТ / РЕСТАРТ / СБРОС в пульте)"
-      },
-      {
-        "address": "/zone{N}/reset",
-        "args": [
-          {
-            "name": "flag",
-            "type": "int",
-            "const": 1
-          },
-          {
-            "name": "force",
-            "type": "int",
-            "enum": [
-              0,
-              1
-            ],
-            "desc": "0 = штатно (зона запускается по своей логике); 1 = ПРИНУДИТЕЛЬНО: немедленно прервать текущее состояние и выполнить с нуля, игнорируя внутренние блокировки и отсутствие сессии"
-          }
-        ],
-        "desc": "Последний аргумент — флаг принудительного режима.",
-        "also": "та же команда может прийти всем зонам сразу (кнопки ВСЕ: СТАРТ / РЕСТАРТ / СБРОС в пульте)"
-      },
-      {
-        "address": "/zone{N}/count",
-        "args": [
-          {
-            "name": "n",
-            "type": "int"
-          }
-        ],
-        "rate_hz": 30,
-        "desc": "гостей сейчас в зоне"
-      },
-      {
-        "address": "/zone{N}/session/{num}/guest/{idx}/pos",
-        "args": [
-          {
-            "name": "zx_rel",
-            "type": "float",
-            "range": [
-              0,
-              1
-            ],
-            "desc": "положение внутри зоны вдоль тоннеля"
-          },
-          {
-            "name": "zy_rel",
-            "type": "float",
-            "range": [
-              0,
-              1
-            ],
-            "desc": "поперёк тоннеля"
-          },
-          {
-            "name": "zx_abs",
-            "type": "float",
-            "unit": "m",
-            "desc": "метры от угла зоны"
-          },
-          {
-            "name": "zy_abs",
-            "type": "float",
-            "unit": "m"
-          },
-          {
-            "name": "x",
-            "type": "float",
-            "unit": "m",
-            "desc": "метры тоннеля целиком, 0..15"
-          },
-          {
-            "name": "y",
-            "type": "float",
-            "unit": "m",
-            "desc": "0..3"
-          },
-          {
-            "name": "beacon",
-            "type": "int",
-            "desc": "физический ID, для отладки"
-          }
-        ],
-        "rate_hz": 30,
-        "desc": "позиция гостя. Номер сессии и гость стоят В АДРЕСЕ — при двух группах в тоннеле guest 2 без сессии двусмысленен. Гость без пакетов >0.5 с считается ушедшим."
-      },
-      {
-        "address": "/zone{N}/unassigned/{beacon}/pos",
-        "args": [
-          {
-            "name": "zx_rel",
-            "type": "float"
-          },
-          {
-            "name": "zy_rel",
-            "type": "float"
-          },
-          {
-            "name": "zx_abs",
-            "type": "float"
-          },
-          {
-            "name": "zy_abs",
-            "type": "float"
-          },
-          {
-            "name": "x",
-            "type": "float"
-          },
-          {
-            "name": "y",
-            "type": "float"
-          }
-        ],
-        "rate_hz": 30,
-        "desc": "бикон, не привязанный ни к одной сессии — виден, но ничей"
-      },
-      {
-        "address": "/zone{N}/prompt/enter",
-        "args": [
-          {
-            "name": "uuid",
-            "type": "string"
-          },
-          {
-            "name": "guest",
-            "type": "int"
-          },
-          {
-            "name": "y_rel",
-            "type": "float"
-          }
-        ],
-        "desc": "промпт въезжает из соседней зоны (ретрансляция мастером от zone{N-1}/prompt/exit)"
-      }
-    ],
-    "master_to_panel": [
-      {
-        "address": "/panel/gate",
-        "args": [
-          {
-            "name": "open",
-            "type": "int",
-            "enum": [
-              0,
-              1
-            ]
-          }
-        ],
-        "desc": "1 = можно пускать новую группу к выбору промпта. Открывается, когда зоны Gatezones (1,2) пусты дольше Gatehold (4 с) и групп меньше Maxactive; закрывается мгновенно.",
-        "status": "мастер шлёт; приём на стороне панели ещё не реализован"
-      }
-    ],
-    "zones_to_master": [
-      {
-        "address": "/zone{N}/sound/{trigger}",
-        "args": [
-          {
-            "name": "any",
-            "type": "any",
-            "optional": true
-          }
-        ],
-        "target": "10.10.10.10:12000",
-        "desc": "звуковой триггер зоны; мастер логирует и (позже) играет на Soundcard 6ch"
-      },
-      {
-        "address": "/zone{N}/prompt/exit",
-        "args": [
-          {
-            "name": "uuid",
-            "type": "string"
-          },
-          {
-            "name": "guest",
-            "type": "int"
-          },
-          {
-            "name": "y_rel",
-            "type": "float"
-          }
-        ],
-        "target": "10.10.10.10:12000",
-        "desc": "промпт ушёл из кадра зоны N; мастер ретранслирует его зоне N+1 как prompt/enter. Из зоны 4 не ретранслируется."
-      }
-    ],
-    "panel_to_master": [
-      {
-        "address": "/panel/session/guests",
-        "args": [
-          {
-            "name": "uuid",
-            "type": "string"
-          },
-          {
-            "name": "N",
-            "type": "int"
-          }
+        "y": [
+          0.0,
+          3.0
         ]
-      },
-      {
-        "address": "/panel/guest/{K}/prompt",
-        "args": [
-          {
-            "name": "uuid",
-            "type": "string"
-          },
-          {
-            "name": "guest",
-            "type": "int"
-          },
-          {
-            "name": "promptid",
-            "type": "int"
-          },
-          {
-            "name": "topicid",
-            "type": "int"
-          },
-          {
-            "name": "text",
-            "type": "string"
-          }
-        ]
-      },
-      {
-        "address": "/panel/session/start",
-        "args": [
-          {
-            "name": "uuid",
-            "type": "string"
-          },
-          {
-            "name": "N",
-            "type": "int"
-          },
-          {
-            "name": "promptid1",
-            "type": "int"
-          },
-          {
-            "name": "promptid2",
-            "type": "int"
-          },
-          {
-            "name": "promptid3",
-            "type": "int"
-          }
-        ],
-        "desc": "момент, когда мастер заводит группу в реестр и присваивает номер"
-      },
-      {
-        "address": "/panel/session/end",
-        "args": [
-          {
-            "name": "uuid",
-            "type": "string"
-          }
-        ]
-      },
-      {
-        "address": "/panel/session/abort",
-        "args": [
-          {
-            "name": "uuid",
-            "type": "string"
-          }
-        ]
-      },
-      {
-        "address": "/panel/screen",
-        "args": [
-          {
-            "name": "screen",
-            "type": "int"
-          }
-        ],
-        "desc": "мастер игнорирует"
       }
     ]
   },
-  "sequence": [
-    "панель: /panel/session/guests -> /panel/guest/K/prompt (на каждого) -> /panel/session/start",
-    "мастер выдаёт номер сессии, шлёт зонам /show/session/start + /show/session/prompt, при Autostartzone1 — /zone1/start",
-    "гости входят в зону 1: мастер привязывает биконы к гостям и ПОВТОРЯЕТ рассылку состава (теперь с beacon)",
-    "движение: /zone{N}/session/{num}/guest/{idx}/pos 30 Гц + /zone{N}/count, /show/clock фоном",
-    "переход между зонами: зона шлёт /zone{N}/prompt/exit -> мастер шлёт /zone{N+1}/prompt/enter",
-    "все биконы группы вне зон дольше Exitgrace -> /show/session/end, биконы свободны"
+  "master_to_zones": [
+    {
+      "addr": "/show/clock",
+      "args": "seconds:float",
+      "rate_hz": 30,
+      "note": "часы шоу"
+    },
+    {
+      "addr": "/show/state",
+      "args": "state:str",
+      "values": [
+        "standby",
+        "running",
+        "finished"
+      ]
+    },
+    {
+      "addr": "/show/reset",
+      "args": "1:int"
+    },
+    {
+      "addr": "/show/finish",
+      "args": "1:int"
+    },
+    {
+      "addr": "/show/ping",
+      "args": "1:int",
+      "note": "проверка связи"
+    },
+    {
+      "addr": "/show/session/start",
+      "args": "num:int uuid:str guests:int",
+      "note": "состав группы; повторяется при каждой правке привязок"
+    },
+    {
+      "addr": "/show/session/prompt",
+      "args": "num:int guest:int beacon:int promptid:int topicid:int text:str",
+      "note": "чей промпт"
+    },
+    {
+      "addr": "/show/session/end",
+      "args": "num:int",
+      "note": "группа вышла из тоннеля"
+    },
+    {
+      "addr": "/zoneN/start",
+      "args": "uuid:str force:int"
+    },
+    {
+      "addr": "/zoneN/restart",
+      "args": "uuid:str force:int"
+    },
+    {
+      "addr": "/zoneN/reset",
+      "args": "1:int force:int"
+    },
+    {
+      "addr": "/zoneN/count",
+      "args": "n:int",
+      "rate_hz": 30,
+      "note": "гостей в зоне"
+    },
+    {
+      "addr": "/zoneN/session/{num}/guest/{idx}/pos",
+      "args": "zx_rel:float zy_rel:float zx_abs:float zy_abs:float x:float y:float beacon:int",
+      "rate_hz": 30,
+      "note": "позиция гостя; сессия и гость — в адресе"
+    },
+    {
+      "addr": "/zoneN/unassigned/{beacon}/pos",
+      "args": "zx_rel:float zy_rel:float zx_abs:float zy_abs:float x:float y:float",
+      "rate_hz": 30,
+      "note": "бикон без сессии"
+    },
+    {
+      "addr": "/zoneN/prompt/enter",
+      "args": "uuid:str guest:int y_rel:float",
+      "note": "промпт въезжает из соседней зоны"
+    }
   ],
-  "zone_minimum_todo": [
-    "слушать UDP 10000, отвечать на /zone{N}/start|restart|reset",
-    "уважать флаг force: при force=1 прерывать текущее состояние и стартовать с нуля, не дожидаясь гостя и не проверяя свои блокировки",
-    "держать словарь num -> {guest -> промпт} из /show/session/*, чистить по session/end",
-    "рисовать гостей по /zone{N}/session/{num}/guest/{idx}/pos, брать zx_rel/zy_rel",
-    "слать /zone{N}/sound/<триггер> на 10.10.10.10:12000",
-    "на выходе промпта из кадра слать /zone{N}/prompt/exit"
+  "master_to_panel": [
+    {
+      "addr": "/panel/gate",
+      "args": "open:int",
+      "values": [
+        0,
+        1
+      ],
+      "note": "1 — можно пускать новую группу"
+    }
   ],
+  "zones_to_master": [
+    {
+      "addr": "/zoneN/sound/{trigger}",
+      "args": "любые",
+      "note": "звуковой триггер зоны"
+    },
+    {
+      "addr": "/zoneN/prompt/exit",
+      "args": "uuid:str guest:int y_rel:float",
+      "note": "мастер ретранслирует зоне N+1 как prompt/enter"
+    }
+  ],
+  "panel_to_master": [
+    {
+      "addr": "/panel/session/guests",
+      "args": "uuid:str N:int"
+    },
+    {
+      "addr": "/panel/guest/{K}/prompt",
+      "args": "uuid:str guest:int promptid:int topicid:int text:str"
+    },
+    {
+      "addr": "/panel/session/start",
+      "args": "uuid:str N:int p1:int p2:int p3:int"
+    },
+    {
+      "addr": "/panel/session/end",
+      "args": "uuid:str"
+    },
+    {
+      "addr": "/panel/session/abort",
+      "args": "uuid:str"
+    },
+    {
+      "addr": "/panel/screen",
+      "args": "n:int",
+      "note": "мастер игнорирует"
+    }
+  ],
+  "rules": {
+    "session": "Номер сессии (num) стоит В АДРЕСЕ позиций: в тоннеле одновременно до 2 групп, и «гость 2» без сессии двусмысленен. guest — 1..3 внутри группы, beacon — физический BlackTrax ID.",
+    "force": "Последний аргумент start/restart/reset: 0 — штатно, 1 — зона немедленно прерывает текущее состояние и стартует с нуля, игнорируя блокировки и отсутствие сессии.",
+    "positions": "zx_rel/zy_rel — 0..1 внутри своей зоны (обычно нужны они); zx_abs/zy_abs — метры от угла зоны; x/y — метры тоннеля целиком. Гость без пакетов дольше 0.5 с считается ушедшим.",
+    "zone_todo": "Зона: слушать 6000, отвечать на start/restart/reset и уважать force; держать num -> {guest -> промпт} из /show/session/*, чистить по session/end; рисовать гостей по pos; слать sound-триггеры и prompt/exit на мастера:6002."
+  },
   "not_implemented": [
-    "ArtNet/свет мастером не управляется",
-    "приём /panel/gate на стороне тач-панели",
-    "проигрывание звука на Soundcard 6ch (роутинг триггеров готов, аудио нет)"
+    "ArtNet/свет мастером не управляется (artgate 2.0.0.14, artnet spi 2.0.0.12)",
+    "сенсоры 10.10.10.17-19 и гравёры 10.10.10.20-21 ходят через зону 4 мимо мастера",
+    "приём /panel/gate на стороне панели",
+    "проигрывание звука на Soundcard 6ch (роутинг триггеров готов)"
   ]
 }
