@@ -10,3 +10,6 @@ recordings/
 
 .DS_Store
 _tdparse*/
+
+# внутренние заметки команды — в репозиторий не уходят
+docs/_internal*
