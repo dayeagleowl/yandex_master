@@ -10,41 +10,41 @@
       "master": {
         "ip": "10.10.10.10",
         "listens": {
-          "from_panel": 10000,
-          "from_zones": 12000,
+          "from_panel": 6001,
+          "from_zones": 6002,
           "blacktrax_rttrpm": 24002
         }
       },
       "zone1": {
         "ip": "10.10.10.11",
         "listens": {
-          "from_master": 10000
+          "from_master": 6000
         },
         "role": "вход, справа"
       },
       "zone2": {
         "ip": "10.10.10.12",
         "listens": {
-          "from_master": 10000
+          "from_master": 6000
         }
       },
       "zone3": {
         "ip": "10.10.10.13",
         "listens": {
-          "from_master": 10000
+          "from_master": 6000
         }
       },
       "zone4": {
         "ip": "10.10.10.14",
         "listens": {
-          "from_master": 10000
+          "from_master": 6000
         },
         "role": "выход, слева"
       },
       "touchpanel": {
         "ip": "10.10.10.15",
         "listens": {
-          "from_master": 10001
+          "from_master": 6003
         }
       },
       "blacktrax": {
