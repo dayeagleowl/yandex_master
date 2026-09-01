@@ -12,7 +12,7 @@ TouchDesigner **2025.33070** · открывать `master_project_v1.toe` (ка
 |---|---|---|
 | `bt_input` | ✅ готов | Приём BlackTrax: **live** (RTTrPM UDP 24002) или **playback** записей тестов из `recordings/`. Выход `OUT_ALL` — полный декодированный поток (`beaconN:tx/ty/tz/...`). |
 | `zones` | ✅ готов | Позиции гостей в тоннеле: метры вдоль/поперёк, номер зоны, абсолютные метры внутри зоны, относительные 0..1, счётчики. Выход `OUT_ZONES` (`guestN:...`, `zoneK:count`). Геометрия — см. ниже. |
-| `show_control` | ✅ готов | Часы шоу (идут в `running`), приём сессий от тач-панели (OSC, порт 10000, контракт `/panel/...`), таблицы `sessions`/`prompts`, команды зонам (start/restart/reset, общий reset, finish, standby), гейт новой группы (`Gatezones` пусты → `/panel/gate 1`). |
+| `show_control` | ✅ готов | Часы шоу (идут в `running`), приём сессий от тач-панели (OSC, порт 10000, контракт `/panel/...`), таблицы `sessions`/`prompts`, команды зонам (start/restart/reset, общий reset, finish, standby), гейт новой группы с антидребезгом (`Gatezones` пусты дольше `Gatehold` → `/panel/gate 1`; закрытие мгновенное). |
 | `osc_dispatch` | ✅ готов* | Рассылка слейвам: `/show/clock`+позиции `Posrate` Гц, команды, `/show/session/start`+`/show/prompt`. Адресация совместима с `osc_zone.tox`. *В таблице `slaves` — локальные плейсхолдеры, вписать реальные IP компов зон. |
 | `osc_monitor` | 🔧 отладка | Порт 11002. При реальных IP: временно направь нужную зону в `slaves` на `127.0.0.1:11002` — увидишь весь её трафик. |
 | `sound_engine` | 🟡 роутинг готов | Зоны шлют мастеру `/zoneN/sound/<trig>` (порт 12000) → `trigger_log`. Проигрывание на Soundcard 6ch — TODO (нужны аудиофайлы и карта триггер→файл→каналы). |
