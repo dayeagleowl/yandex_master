@@ -1,12 +1,6 @@
 # master_project_v1 — мастер-проект инсталляции DEEPTECHNIGHT
 
-TouchDesigner **2025.33070** · открывать `master_project_v1.toe` (канонический файл, всегда последняя версия; нумерованные `.N.toe` и `Backup/` — история TD).
-
-> **Что отдавать на компы зон и панели** — одна спека в трёх видах:
-> [`protocol.json`](protocol.json) — машиночитаемый контракт (обновляется кнопкой ЭКСПОРТ JSON в пульте);
-> [`docs/Протокол_мастера.docx`](docs/Протокол_мастера.docx) — документ Word для отправки подрядчикам;
-> [`docs/PROTOCOL.md`](docs/PROTOCOL.md) — то же в markdown, для git и правок.
-> Внутри: все адреса, аргументы, порты, порядок событий и что минимально должна делать зона.
+TouchDesigner **2025.33070**
 
 ## Что это
 
@@ -73,8 +67,6 @@ ArtNet (artgate `2.0.0.14`, artnet spi `2.0.0.12`) — свет, мастеро�
 - `/zoneN/session/<num>/guest/<idx>/pos [zx_rel zy_rel zx_abs zy_abs x y beacon]` — позиции 30 Гц, **номер сессии в адресе**
 - `/zoneN/unassigned/<beacon>/pos [...]` — бикон без сессии (виден, но ничей)
 - `/zoneN/start|restart [uuid force]`, `/zoneN/reset [1 force]`, `/zoneN/count [n]`, `/zoneN/prompt/enter [uuid guest y_rel]`
-
-Зона N → мастеру (`10.10.10.10:6002`): `/zoneN/sound/<trig> [args]` — звуковой триггер; `/zoneN/prompt/exit [uuid guest y_rel]` — промпт уходит из зоны, мастер передаёт его зоне N+1 как `prompt/enter`.
 
 ## Геометрия тоннеля
 
