@@ -1,0 +1,63 @@
+name: Протокол
+
+# Каждый пуш и каждый PR: проверяем, что контракт не сломан, и пересобираем
+# Word-версию спеки. Так документ, который уезжает подрядчикам, всегда
+# соответствует protocol.json — никто не забудет пересобрать вручную.
+
+on:
+  push:
+    paths:
+      - 'protocol.json'
+      - 'docs/PROTOCOL.md'
+      - 'docs/build_protocol_docx.js'
+      - '.github/workflows/protocol.yml'
+  pull_request:
+    paths:
+      - 'protocol.json'
+      - 'docs/PROTOCOL.md'
+      - 'docs/build_protocol_docx.js'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: protocol.json — валидный JSON и полный контракт
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          d = json.load(open('protocol.json', encoding='utf-8'))
+          need = ['network', 'geometry', 'session_model', 'messages', 'sequence']
+          missing = [k for k in need if k not in d]
+          assert not missing, f'нет разделов: {missing}'
+          for direction, msgs in d['messages'].items():
+              assert msgs, f'{direction}: пусто'
+              for m in msgs:
+                  assert 'address' in m and 'args' in m, f'{direction}: сообщение без address/args: {m}'
+                  for a in m['args']:
+                      assert 'name' in a and 'type' in a, f"{m['address']}: аргумент без name/type: {a}"
+          hosts = d['network']['hosts']
+          for h in ['master', 'zone1', 'zone2', 'zone3', 'zone4', 'touchpanel']:
+              assert h in hosts, f'нет хоста {h}'
+          print('protocol.json в порядке:',
+                sum(len(v) for v in d['messages'].values()), 'сообщений,',
+                len(d['geometry']['zones']), 'зон, обновлён', d['updated'])
+          PY
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Пересобрать Word-версию спеки
+        run: |
+          npm install docx --no-save --silent
+          node docs/build_protocol_docx.js "Протокол_мастера.docx"
+          ls -la "Протокол_мастера.docx"
+
+      - name: Приложить документ к запуску
+        uses: actions/upload-artifact@v4
+        with:
+          name: Протокол_мастера
+          path: Протокол_мастера.docx

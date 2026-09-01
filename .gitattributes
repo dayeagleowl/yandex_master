@@ -1,0 +1,22 @@
+# TouchDesigner-файлы — двоичные. Git не умеет их сливать: при конфликте
+# он не «объединит» две правки, а заставит выбрать одну целиком.
+# Отсюда правило работы: .toe одновременно правит ОДИН человек (см. README).
+*.toe   binary -merge -diff
+*.tox   binary -merge -diff
+
+# Документы и медиа — тоже двоичные
+*.docx  binary -merge -diff
+*.pdf   binary
+*.jpg   binary
+*.png   binary
+*.mp4   binary
+*.bclip binary
+
+# Текстовые — сливаются нормально, диффы читаемые
+*.md        text eol=lf
+*.json      text eol=lf
+*.py        text eol=lf
+*.js        text eol=lf
+*.tsv       text eol=lf
+*.csv       text eol=lf
+.gitignore  text eol=lf
