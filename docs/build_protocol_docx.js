@@ -231,13 +231,12 @@ const doc = new Document({
       table(
         ['Адрес', 'Аргументы', 'Когда'],
         [
-          ['/zoneN/start', 'uuid : string\nforce : 0 / 1', 'запуск сцены зоны'],
-          ['/zoneN/restart', 'uuid : string\nforce : 0 / 1', 'перезапуск с начала'],
+          ['/zoneN/start', 'guestCount : int\np1, p2, p3 : int\nforce : 0 / 1', 'запуск сцены — всё пачкой'],
+          ['/zoneN/restart', 'те же аргументы', 'перезапуск с начала'],
           ['/zoneN/reset', '1\nforce : 0 / 1', 'сброс зоны в исходное'],
           ['/zoneN/count', 'n : int', 'гостей сейчас в зоне, 30 Гц'],
-          ['/zoneN/session/<num>/guest/<idx>/pos',
-           'zx_rel, zy_rel,\nzx_abs, zy_abs,\nx, y : float\nbeacon : int', 'позиция гостя, 30 Гц'],
-          ['/zoneN/unassigned/<beacon>/pos', 'те же 6 float', 'бикон без сессии —\nвиден, но ничей'],
+          ['/zoneN/guest/<idx>/pos', 'zx_rel : float\nzy_rel : float', 'поток трекинга, 30 Гц\n(только пока зона идёт)'],
+          ['/zoneN/anchor', 'guestCount : int\nt1, t2, t3 : str', 'итог зоны 3, переданный дальше'],
           ['/zoneN/prompt/enter', 'uuid : string\nguest : int\ny_rel : float', 'промпт въезжает из соседней зоны\n(ретрансляция мастером)'],
         ],
         [3900, 2700, 3480], [0, 1]),
@@ -288,10 +287,14 @@ const doc = new Document({
       table(
         ['Адрес', 'Аргументы', 'Что делает мастер'],
         [
-          ['/zoneN/sound/<триггер>', 'любые', 'кладёт в sound_engine: лог, дальше — проигрывание на Soundcard 6ch'],
-          ['/zoneN/prompt/exit', 'uuid : string\nguest : int\ny_rel : float', 'ретранслирует зоне N+1 как /zone{N+1}/prompt/enter с теми же аргументами'],
+          ['/zoneN/ping', '1', 'держит лампочку «зона на связи»; нет ping дольше 6 с — гаснет'],
+          ['/zoneN/session/start', '—', 'сцена реально пошла: мастер начинает слать позиции'],
+          ['/zoneN/session/end', '—', 'останавливает поток и запускает зону N+1 тем же составом'],
+          ['/zone3/anchor', 'guestCount : int\nt1, t2, t3 : str', 'токены гостей: лог + передача дальше'],
+          ['/zoneN/sound/<триггер>', 'любые', 'кладёт в sound_engine: лог, дальше — звук'],
+          ['/zoneN/prompt/exit', 'uuid : string\nguest : int\ny_rel : float', 'ретранслирует зоне N+1 как prompt/enter'],
         ],
-        [3000, 2400, 4680], [0, 1]),
+        [2600, 2200, 5280], [0, 1]),
       p(''),
       p('prompt/exit — момент, когда промпт уходит из кадра зоны; следующая зона подхватывает его, чтобы он «въехал из соседней зоны». Из зоны 4 промпт никуда не ретранслируется.', { after: 160 }),
 

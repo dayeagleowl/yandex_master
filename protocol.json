@@ -1,7 +1,7 @@
 {
   "about": "Контракт инсталляции: что мастер шлёт зонам и панели и что принимает от них. Всё OSC поверх UDP. Словами то же самое — docs/PROTOCOL.md. Числа обновляются из проекта кнопкой ЭКСПОРТ JSON в пульте.",
-  "version": "2.0",
-  "updated": "2026-08-31",
+  "version": "3.0",
+  "updated": "2026-09-02",
   "ports": {
     "zone_listens": 6000,
     "master_from_panel": 6001,
@@ -71,6 +71,41 @@
   },
   "master_to_zones": [
     {
+      "addr": "/zoneN/start",
+      "args": "guestCount:int p1:int p2:int p3:int force:int",
+      "note": "запуск сцены: сколько гостей и их промпты одной пачкой"
+    },
+    {
+      "addr": "/zoneN/restart",
+      "args": "guestCount:int p1:int p2:int p3:int force:int"
+    },
+    {
+      "addr": "/zoneN/reset",
+      "args": "1:int force:int"
+    },
+    {
+      "addr": "/zoneN/guest/{idx}/pos",
+      "args": "zx_rel:float zy_rel:float",
+      "rate_hz": 30,
+      "note": "поток трекинга; idx = 1..guestCount; идёт от старта зоны до её финиша"
+    },
+    {
+      "addr": "/zoneN/count",
+      "args": "n:int",
+      "rate_hz": 30,
+      "note": "гостей в зоне"
+    },
+    {
+      "addr": "/zoneN/anchor",
+      "args": "guestCount:int t1:str t2:str t3:str",
+      "note": "ретрансляция итога зоны 3 дальше по тоннелю"
+    },
+    {
+      "addr": "/zoneN/prompt/enter",
+      "args": "uuid:str guest:int y_rel:float",
+      "note": "промпт въезжает из соседней зоны"
+    },
+    {
       "addr": "/show/clock",
       "args": "seconds:float",
       "rate_hz": 30,
@@ -97,56 +132,39 @@
       "addr": "/show/ping",
       "args": "1:int",
       "note": "проверка связи"
+    }
+  ],
+  "zones_to_master": [
+    {
+      "addr": "/zoneN/ping",
+      "args": "1:int",
+      "rate_hz": 1,
+      "note": "раз в секунду; по нему мастер держит лампочку «зона на связи» (таймаут 6 с)"
     },
     {
-      "addr": "/show/session/start",
-      "args": "num:int uuid:str guests:int",
-      "note": "состав группы; повторяется при каждой правке привязок"
+      "addr": "/zoneN/session/start",
+      "args": "—",
+      "note": "зона реально начала сцену"
     },
     {
-      "addr": "/show/session/prompt",
-      "args": "num:int guest:int beacon:int promptid:int topicid:int text:str",
-      "note": "чей промпт"
+      "addr": "/zoneN/session/end",
+      "args": "—",
+      "note": "зона закончила: мастер останавливает поток трекинга и запускает зону N+1"
     },
     {
-      "addr": "/show/session/end",
-      "args": "num:int",
-      "note": "группа вышла из тоннеля"
+      "addr": "/zone3/anchor",
+      "args": "guestCount:int t1:str t2:str t3:str",
+      "note": "итог зоны 3: токен на каждого гостя"
     },
     {
-      "addr": "/zoneN/start",
-      "args": "uuid:str force:int"
+      "addr": "/zoneN/sound/{trigger}",
+      "args": "любые",
+      "note": "звуковой триггер зоны"
     },
     {
-      "addr": "/zoneN/restart",
-      "args": "uuid:str force:int"
-    },
-    {
-      "addr": "/zoneN/reset",
-      "args": "1:int force:int"
-    },
-    {
-      "addr": "/zoneN/count",
-      "args": "n:int",
-      "rate_hz": 30,
-      "note": "гостей в зоне"
-    },
-    {
-      "addr": "/zoneN/session/{num}/guest/{idx}/pos",
-      "args": "zx_rel:float zy_rel:float zx_abs:float zy_abs:float x:float y:float beacon:int",
-      "rate_hz": 30,
-      "note": "позиция гостя; сессия и гость — в адресе"
-    },
-    {
-      "addr": "/zoneN/unassigned/{beacon}/pos",
-      "args": "zx_rel:float zy_rel:float zx_abs:float zy_abs:float x:float y:float",
-      "rate_hz": 30,
-      "note": "бикон без сессии"
-    },
-    {
-      "addr": "/zoneN/prompt/enter",
+      "addr": "/zoneN/prompt/exit",
       "args": "uuid:str guest:int y_rel:float",
-      "note": "промпт въезжает из соседней зоны"
+      "note": "мастер ретранслирует зоне N+1 как prompt/enter"
     }
   ],
   "master_to_panel": [
@@ -158,18 +176,6 @@
         1
       ],
       "note": "1 — можно пускать новую группу"
-    }
-  ],
-  "zones_to_master": [
-    {
-      "addr": "/zoneN/sound/{trigger}",
-      "args": "любые",
-      "note": "звуковой триггер зоны"
-    },
-    {
-      "addr": "/zoneN/prompt/exit",
-      "args": "uuid:str guest:int y_rel:float",
-      "note": "мастер ретранслирует зоне N+1 как prompt/enter"
     }
   ],
   "panel_to_master": [
@@ -200,10 +206,11 @@
     }
   ],
   "rules": {
-    "session": "Номер сессии (num) стоит В АДРЕСЕ позиций: в тоннеле одновременно до 2 групп, и «гость 2» без сессии двусмысленен. guest — 1..3 внутри группы, beacon — физический BlackTrax ID.",
-    "force": "Последний аргумент start/restart/reset: 0 — штатно, 1 — зона немедленно прерывает текущее состояние и стартует с нуля, игнорируя блокировки и отсутствие сессии.",
-    "positions": "zx_rel/zy_rel — 0..1 внутри своей зоны (обычно нужны они); zx_abs/zy_abs — метры от угла зоны; x/y — метры тоннеля целиком. Гость без пакетов дольше 0.5 с считается ушедшим.",
-    "zone_todo": "Зона: слушать 6000, отвечать на start/restart/reset и уважать force; держать num -> {guest -> промпт} из /show/session/*, чистить по session/end; рисовать гостей по pos; слать sound-триггеры и prompt/exit на мастера:6002."
+    "zone_knows_nothing": "Зона о сессиях не знает. Всё нужное приходит в /zoneN/start: сколько гостей и какие у них промпты. Гость внутри зоны — просто idx 1..guestCount, тот же порядок, что и промпты в старте.",
+    "stream": "Поток /zoneN/guest/{idx}/pos идёт зоне ТОЛЬКО между её стартом и её же /zoneN/session/end. После финиша мастер замолкает. Координаты относительные внутри зоны, 0..1; весь пересчёт из метров и привязку биконов делает мастер.",
+    "chain": "Финиш зоны N автоматически запускает зону N+1 тем же составом группы (тумблер Autonext на мастере).",
+    "force": "Последний аргумент start/restart/reset: 0 — штатно, 1 — зона немедленно прерывает текущее состояние и стартует с нуля, игнорируя блокировки.",
+    "telemetry": "Зона раз в секунду шлёт /zoneN/ping. Мастер держит по каждой зоне: онлайн, состояние сцены, идёт ли поток — видно лампочками в пульте и пишется в журналы (dispatch_log, nodes_log, bt_log)."
   },
   "not_implemented": [
     "ArtNet/свет мастером не управляется (artgate 2.0.0.14, artnet spi 2.0.0.12)",
