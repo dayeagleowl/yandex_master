@@ -1,7 +1,7 @@
 {
   "about": "Контракт инсталляции: что мастер шлёт зонам и панели и что принимает от них. Всё OSC поверх UDP. Словами то же самое — docs/PROTOCOL.md. Числа обновляются из проекта кнопкой ЭКСПОРТ JSON в пульте.",
-  "version": "3.4",
-  "updated": "2026-09-02",
+  "version": "3.5",
+  "updated": "2026-09-03",
   "ports": {
     "zone_listens": 6000,
     "master_from_panel": 6001,
@@ -214,27 +214,35 @@
     },
     {
       "addr": "/panel/session/guests",
-      "args": "uuid:str N:int"
+      "args": "json:str",
+      "fields": "event=guests, session:int, uuid:str, time:str, guests:int",
+      "note": "сколько участников в группе"
     },
     {
       "addr": "/panel/guest/{K}/prompt",
-      "args": "uuid:str guest:int promptid:int topicid:int text:str"
+      "args": "json:str",
+      "fields": "event=guestpick, session:int, uuid:str, time:str, guest:int, topic_id:int, topic:str, prompt_id:int, prompt:str, mode:str",
+      "note": "выбор одного участника; mode = manual | random"
     },
     {
       "addr": "/panel/session/start",
-      "args": "uuid:str N:int p1:int p2:int p3:int"
+      "args": "json:str",
+      "fields": "event=ready, session:int, uuid:str, time:str, guest_count:int, prompt_ids:[int,int,int], guests:[{guest,topic_id,topic,prompt_id,prompt,mode}]",
+      "note": "весь документ сессии: по нему мастер заводит группу и стартует зону 1"
     },
     {
       "addr": "/panel/session/end",
-      "args": "uuid:str"
+      "args": "json:str",
+      "fields": "event=end, session:int, uuid:str, time:str"
     },
     {
       "addr": "/panel/session/abort",
-      "args": "uuid:str"
+      "args": "json:str",
+      "fields": "event=abort, session:int, uuid:str, time:str, by:str"
     },
     {
       "addr": "/panel/screen",
-      "args": "n:int",
+      "args": "json:str",
       "note": "мастер игнорирует"
     }
   ],
@@ -248,6 +256,8 @@
     "parallel_groups": "В тоннеле до Maxactive групп (2). Каждая зона занята ровно одной группой (zone_state.session), и поток позиций фильтруется по ней: отставший гость чужой группы в поток зоны не попадёт. Гейт не пускает новую группу, пока зоны Gatezones не пусты дольше Gatehold.",
     "time": "Три разных времени: /show/clock (30 Гц) — общие часы шоу; /zoneN/time (1 Гц) — сколько идёт сцена именно этой зоны; /show/heartbeat (1 Гц) — пульс мастера с растущим seq для контроля связи и детекта его перезапуска.",
     "delivery": "OSC идёт по UDP — пакет может потеряться молча. Поэтому /zoneN/start считается доставленным только когда зона ответила /zoneN/session/start. Нет ответа — мастер повторяет команду (Ackwait 1.5 с, всего Ackretries 3 отправки), потом зажигает «НЕ ОТВЕТИЛ» и пишет в журнал. ВАЖНО ДЛЯ ЗОНЫ: отвечать session/start обязательно, иначе мастер будет считать зону упавшей; повторный start до ответа — это тот же старт, а не новая группа.",
+    "panel_format": "Тело сообщений панели — ОДНА СТРОКА JSON (штатный режим YS_prompt_panel, параметр Oscformat): {\"event\":…, \"session\":12, \"uuid\":\"…\", \"time\":\"…\", …поля события}. session в шапке — сквозной счётчик самой панели, он не равен номеру сессии в тоннеле (тот свой, в active_sessions мастера); мастер хранит оба, чтобы сверять журналы двух проектов. Второй режим панели — плоские позиционные аргументы (event, session, uuid, time, …поля события); мастер понимает оба, потому что переключатель живёт на стороне панели. Повторный /panel/session/start с тем же uuid новую группу не заводит — обновляет состав.",
+    "chain_pack": "Состав группы едет по цепочке от зоны к зоне: финиш зоны N запускает зону N+1 тем составом, который помнит сама зона N. Поэтому если группа физически вышла из тоннеля и её сессия закрылась, пока зона доигрывала сцену, следующая зона всё равно получит своих гостей и промпты.",
     "watchdog": "Если зона стартовала и не прислала session/end дольше Scenetimeout (300 с), мастер помечает сцену как затянувшуюся — лампочка и журнал. Автосброса нет: зона может честно играть длинную сцену, а рестарт на глазах у гостей хуже предупреждения."
   },
   "not_implemented": [
