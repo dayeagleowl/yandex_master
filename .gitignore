@@ -17,3 +17,6 @@ docs/_internal*
 # нумерованные версии стенда и эмулятора
 zone_stub_stand.[0-9]*.toe
 zone_dev_kit/zone_dev_kit.[0-9]*.toe
+
+# журналы прогонов — на машине, не в репозитории
+logs/
