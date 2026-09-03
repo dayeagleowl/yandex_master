@@ -219,13 +219,11 @@ const doc = new Document({
           ['/show/reset', '1', 'оператор нажал СБРОС ВСЕГО'],
           ['/show/finish', '1', 'оператор нажал FINISH'],
           ['/show/ping', '1', 'проверка связи (Testsend)'],
-          ['/show/session/start', 'num : int\nuuid : string\nguests : int', 'группа зарегистрирована;\nповторяется при каждой правке привязок'],
-          ['/show/session/prompt', 'num, guest, beacon,\npromptid, topicid : int\ntext : string', 'по одному на каждого гостя,\nследом за session/start'],
-          ['/show/session/end', 'num : int', 'группа вышла из тоннеля'],
+          ['/show/hello', '1', 'мастер поднялся: зона сбрасывается\nи отвечает ping'],
         ],
         [3100, 3400, 3580], [0, 1]),
       p(''),
-      p('Если гость ещё не привязан к бикону, его строка придёт позже — при следующей рассылке состава.', { after: 160 }),
+      p('Эти сообщения идут всем зонам разом и не привязаны к группе.', { after: 160 }),
 
       h2('4.2. Персонально зоне N'),
       table(
@@ -233,6 +231,7 @@ const doc = new Document({
         [
           ['/zoneN/start', 'guestCount : int\np1, p2, p3 : int\nforce : 0 / 1', 'запуск сцены — всё пачкой'],
           ['/zoneN/restart', 'те же аргументы', 'перезапуск с начала'],
+          ['/zoneN/update', 'guestCount : int\np1, p2, p3 : int', 'состав изменился —\nобновить без рестарта'],
           ['/zoneN/reset', '1\nforce : 0 / 1', 'сброс зоны в исходное'],
           ['/zoneN/count', 'n : int', 'гостей сейчас в зоне, 30 Гц'],
           ['/zoneN/guest/<idx>/pos', 'zx_rel : float\nzy_rel : float', 'поток трекинга, 30 Гц\n(только пока зона идёт)'],
@@ -258,6 +257,13 @@ const doc = new Document({
         { t: ' шлют команду каждой зоне из таблицы slaves. Из кода: ' },
         { t: 'StartZone(2, force=True)', mono: true }, { t: ', ' },
         { t: "AllZones('restart', force=True)", mono: true }, { t: '.' },
+      ], { after: 160 }),
+      p('Начало отсчёта:', { bold: true, after: 100 }),
+      rich([
+        { t: 'zx_rel / zy_rel', mono: true },
+        { t: ' считаются от угла зоны (xmin, ymin) — левого нижнего на плане: x растёт вправо вдоль тоннеля, y — поперёк. Движение справа налево, поэтому гость входит в зону со стороны zx_rel = 1 и идёт к 0. Если сцене удобнее «вход = 0», пара ' },
+        { t: 'Relorigin', mono: true },
+        { t: ' на zones переключается в режим entry — мастер развернёт шкалу сам, зоне менять ничего не нужно.' },
       ], { after: 160 }),
       p('Про позиции — главное:', { bold: true, after: 100 }),
       bullet('zx_rel, zy_rel — 0…1 внутри своей зоны; для сцены обычно нужны именно они.'),
