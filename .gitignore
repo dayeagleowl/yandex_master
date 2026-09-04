@@ -20,3 +20,6 @@ zone_dev_kit/zone_dev_kit.[0-9]*.toe
 
 # журналы прогонов — на машине, не в репозитории
 logs/
+
+# настройки конкретной площадки — не в репозиторий (пример: settings.example.json)
+settings.local.json
