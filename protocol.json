@@ -1,6 +1,6 @@
 {
   "about": "Контракт инсталляции: что мастер шлёт зонам и панели и что принимает от них. Всё OSC поверх UDP. Словами то же самое — docs/PROTOCOL.md. Числа обновляются из проекта кнопкой ЭКСПОРТ JSON в пульте.",
-  "version": "3.8",
+  "version": "3.9",
   "updated": "2026-09-04",
   "ports": {
     "zone_listens": 6000,
@@ -116,6 +116,18 @@
       "note": "ретрансляция итога зоны 3 (выбор/направление) дальше по тоннелю; токенов всегда три, лишние — пустые строки. Зоне 4 приходит трижды: сразу как зона 3 прислала, ещё раз сразу после /zone4/start и после ответа зоны 4 session/start — принимать как один и тот же итог"
     },
     {
+      "addr": "/zone4/code",
+      "args": "code:str",
+      "only_zone": 4,
+      "note": "код группы с панели (например 233C) для строки на брелоке; суффикс -G<гость> зона 4 добавляет сама. Уходит вместе с /zone4/start и ещё раз после ответа зоны session/start"
+    },
+    {
+      "addr": "/zone4/prealert",
+      "args": "json:str",
+      "only_zone": 4,
+      "note": "ретрансляция /panel/session/prealert как есть: за ~20 с до конца сеанса, тело самодостаточное — code, seconds_left, guest_count, prompt_ids, guests[] с code гостя и промптами. Зоне 4 поднимать гравировку"
+    },
+    {
       "addr": "/zone4/leave",
       "args": "1:int",
       "only_zone": 4,
@@ -227,14 +239,20 @@
     {
       "addr": "/panel/guest/{K}/prompt",
       "args": "json:str",
-      "fields": "event=guestpick, session:int, uuid:str, time:str, guest:int, topic_id:int, topic:str, prompt_id:int, prompt:str, mode:str",
+      "fields": "event=guestpick, session:int, code:str, uuid:str, time:str, guest:int, code:str, topic_id:int, topic:str, prompt_id:int, prompt:str, mode:str",
       "note": "выбор одного участника; mode = manual | random"
     },
     {
       "addr": "/panel/session/start",
       "args": "json:str",
-      "fields": "event=ready, session:int, uuid:str, time:str, guest_count:int, prompt_ids:[int,int,int], guests:[{guest,topic_id,topic,prompt_id,prompt,mode}]",
+      "fields": "event=ready, session:int, code:str, uuid:str, time:str, guest_count:int, prompt_ids:[int,int,int], guests:[{guest,code,topic_id,topic,prompt_id,prompt,mode}]",
       "note": "весь документ сессии: по нему мастер заводит группу и стартует зону 1"
+    },
+    {
+      "addr": "/panel/session/prealert",
+      "args": "json:str",
+      "fields": "event=prealert, session:int, code:str, uuid:str, time:str, seconds_left:float, guest_count:int, prompt_ids:[int,int,int], guests:[{guest,code,topic_id,topic,prompt_id,prompt,mode}]",
+      "note": "один раз за сеанс, за ~20 с до конца отсчёта панели: мастер пересылает зоне 4 как /zone4/prealert"
     },
     {
       "addr": "/panel/session/end",
@@ -269,6 +287,7 @@
     "direction": "Движение жёстко направленное и завязано на тайминг сцен: гость, вернувшийся из зоны 2 в зону 1, для зоны 1 не событие — она уже отыграла и больше ничего не получает.",
     "time": "Общих часов шоу зонам НЕТ (/show/clock убран 04.09.2026 — общий тайминг не нужен). Два времени: /zoneN/time (1 Гц) — сколько идёт сцена именно этой зоны; /show/heartbeat (1 Гц) — пульс мастера с растущим seq: по нему проверяется линк и детектится перезапуск мастера.",
     "delivery": "OSC идёт по UDP — пакет может потеряться молча. Поэтому /zoneN/start считается доставленным только когда зона ответила /zoneN/session/start. Нет ответа — мастер повторяет команду (Ackwait 1.5 с, всего Ackretries 3 отправки), потом зажигает «НЕ ОТВЕТИЛ» и пишет в журнал. ВАЖНО ДЛЯ ЗОНЫ: отвечать session/start обязательно, иначе мастер будет считать зону упавшей; повторный start до ответа — это тот же старт, а не новая группа.",
+    "panel_code": "В шапке каждого сообщения панели есть code (три цифры и буква, 233C) — код группы для гравировки. Мастер хранит его при сессии и отдаёт зоне 4 (/zone4/code) со стартом зоны 4 и после её подтверждения. У гостей в guests[] свой code вида 233C-G1 — зона 4 добавляет суффикс сама.",
     "panel_format": "Тело сообщений панели — ОДНА СТРОКА JSON (штатный режим YS_prompt_panel, параметр Oscformat): {\"event\":…, \"session\":12, \"uuid\":\"…\", \"time\":\"…\", …поля события}. session в шапке — сквозной счётчик самой панели, он не равен номеру сессии в тоннеле (тот свой, в active_sessions мастера); мастер хранит оба, чтобы сверять журналы двух проектов. Второй режим панели — плоские позиционные аргументы (event, session, uuid, time, …поля события); мастер понимает оба, потому что переключатель живёт на стороне панели. Повторный /panel/session/start с тем же uuid новую группу не заводит — обновляет состав.",
     "chain_pack": "Состав группы едет по цепочке от зоны к зоне: финиш зоны N запускает зону N+1 тем составом, который помнит сама зона N. Поэтому если группа физически вышла из тоннеля и её сессия закрылась, пока зона доигрывала сцену, следующая зона всё равно получит своих гостей и промпты.",
     "zone_self_start": "session/start и session/end без предшествующей команды мастера (свой демо-цикл зоны) мастер игнорирует: не подтверждение, цепочку не ведёт. На показе демо-цикл зоны должен быть выключен.",
