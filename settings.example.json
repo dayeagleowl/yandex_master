@@ -5,7 +5,7 @@
     "/master/show_control": {
       "Panelport": 6001,
       "Zonesport": 6002,
-      "Maxactive": 2,
+      "Maxactive": 1,
       "Gatezone": 3,
       "Gatehold": 4.0,
       "Pingtimeout": 6.0,
@@ -26,7 +26,14 @@
       "Ndi4": "",
       "Ndi5": "",
       "Ndion": false,
-      "Ndiscale": 0.25
+      "Ndiscale": 0.25,
+      "Poszones": "3 4",
+      "Techsessions": true,
+      "Listenmax": 32,
+      "Scenelen1": 0,
+      "Scenelen2": 0,
+      "Scenelen3": 0,
+      "Scenelen4": 0
     },
     "/master/zones": {
       "Originx": -6.5,
