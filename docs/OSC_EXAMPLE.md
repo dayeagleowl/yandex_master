@@ -83,9 +83,8 @@
 ## 5. Общее для всех зон
 
 ```
-/show/clock     291.3          ← 30 Гц, общие часы шоу
 /show/state     "running"      ← standby | running | finished
-/show/heartbeat 647  16756.0   ← 1 Гц, пульс мастера: seq и аптайм
+/show/heartbeat 647  16756.0   ← 1 Гц, пульс мастера: seq и аптайм. По нему проверять линк; общих часов шоу нет
 /show/hello     1              ← мастер поднялся: сбросить сцену и ответить ping
 /show/reset     1
 /show/finish    1

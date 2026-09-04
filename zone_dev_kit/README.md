@@ -45,7 +45,7 @@ TouchDesigner **2025.33070**.
 | HELLO / ПИНГ / ФИНИШ / ОБЩИЙ СБРОС | `/show/hello`, `/show/ping`, `/show/finish`, `/show/reset` |
 | STANDBY / RUNNING | `/show/state standby` / `running` |
 
-Фоном всё время идут потоки: `/show/clock` 30 Гц, `/show/heartbeat` 1 Гц, а во время сцены — `/zoneN/guest/<idx>/pos` 30 Гц, `/zoneN/count` 30 Гц и `/zoneN/time` 1 Гц. Любой из них выключается на странице пар «Потоки».
+Фоном всё время идёт `/show/heartbeat` 1 Гц (общих часов `/show/clock` больше нет), а во время сцены — `/zoneN/guest/<idx>/pos` 30 Гц, `/zoneN/count` 30 Гц и `/zoneN/time` 1 Гц. Любой из них выключается на странице пар «Потоки».
 
 **СЮЖЕТ** — прогон целиком, с движением гостей:
 
