@@ -75,7 +75,7 @@ ArtNet (artgate `2.0.0.14`, artnet spi `2.0.0.12`) — свет, мастеро�
 | `/zoneN/guest/<idx>/pos` | `zx_rel zy_rel` — поток 30 Гц |
 | `/zoneN/guest/<idx>/state` | `tracked` — 0 трек потерян, 1 вернулся |
 | `/zoneN/time` | `elapsed` — 1 Гц, таймер сцены этой зоны |
-| `/zoneN/count` | `n` — сколько человек в зоне |
+| `/zoneN/count` | `n` — сколько человек в зоне; событие при изменении, не поток |
 | `/zoneN/anchor` | `guestCount t1 t2 t3` — итог зоны 3, приходит зоне 4 |
 | `/show/heartbeat` `/show/state` `/show/hello` `/show/ping` `/show/reset` `/show/finish` | общее для всех зон; общих часов (`/show/clock`) нет — линк проверяется пульсом `heartbeat` 1 Гц |
 
