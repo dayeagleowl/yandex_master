@@ -3,7 +3,7 @@
   "version": "3.8",
   "updated": "2026-09-04",
   "ports": {
-    "zone_listens": 6000,
+    "zone_listens": 6010,
     "master_from_panel": 6001,
     "master_from_zones": 6002,
     "panel_listens": 6003,
@@ -11,11 +11,11 @@
   },
   "hosts": {
     "master": "10.10.10.10",
-    "zone1": "10.10.10.11",
-    "zone2": "10.10.10.12",
-    "zone3": "10.10.10.13",
-    "zone4": "10.10.10.14",
-    "panel": "10.10.10.15",
+    "zone1": "127.0.0.1",
+    "zone2": "127.0.0.1",
+    "zone3": "127.0.0.1",
+    "zone4": "127.0.0.1",
+    "panel": "127.0.0.1",
     "blacktrax": "10.10.10.16"
   },
   "tunnel": {
