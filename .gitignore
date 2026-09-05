@@ -24,3 +24,6 @@ logs/
 # настройки конкретной площадки — не в репозиторий (пример: settings.example.json)
 settings.local.json
 zone_farm/zone_farm.[0-9]*.toe
+
+# снимки живого BlackTrax с площадки — не в репозиторий
+*.bclip
