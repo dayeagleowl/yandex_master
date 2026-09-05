@@ -1,179 +1,180 @@
 {
-  "_about": "настройки площадки мастера; пишется само при изменении, грузится при открытии",
-  "_saved": "2026-09-04 08:31:05",
-  "pars": {
-    "/master/show_control": {
-      "Panelport": 6001,
-      "Zonesport": 6002,
-      "Maxactive": 1,
-      "Gatezone": 3,
-      "Gatehold": 4.0,
-      "Pingtimeout": 6.0,
-      "Ackwait": 1.5,
-      "Ackretries": 3,
-      "Scenetimeout": 300.0,
-      "Exitgrace": 8.0,
-      "Assignmode": "pool",
-      "Autonext": true,
-      "Autostartzone1": true,
-      "Entryzone": 1,
-      "Btreport": 10.0,
-      "Btfrozen": 3.0,
-      "Logtofile": true,
-      "Ndi1": "",
-      "Ndi2": "",
-      "Ndi3": "",
-      "Ndi4": "",
-      "Ndi5": "",
-      "Ndion": false,
-      "Ndiscale": 0.25,
-      "Poszones": "3",
-      "Techsessions": true,
-      "Listenmax": 32,
-      "Scenelen1": 0,
-      "Scenelen2": 0,
-      "Scenelen3": 0,
-      "Scenelen4": 0,
-      "Defaultguests": 3,
-      "Defaultprompts": "1 2 3"
-    },
-    "/master/zones": {
-      "Originx": -6.5,
-      "Originy": -1.5,
-      "Invertx": false,
-      "Inverty": false,
-      "Xchan": "tx",
-      "Ychan": "tz",
-      "Tunnellength": 15.0,
-      "Tunnelwidth": 3.0,
-      "Relorigin": "entry",
-      "Checkx": 11.25,
-      "Checky": 1.5,
-      "Calbeacon": 1,
-      "Zerox": 7.5,
-      "Zeroy": 3.0,
-      "Xrawa": 1.0,
-      "Xtuna": 7.5,
-      "Xrawb": 8.5,
-      "Xtunb": 15.0,
-      "Yrawa": 1.5,
-      "Ytuna": 3.0,
-      "Yrawb": -1.5,
-      "Ytunb": 0.0,
-      "Nudgestep": 0.5
-    },
-    "/master/bt_input": {
-      "Port": 24002,
-      "Protocol": "msging",
-      "Netaddress": "239.0.0.1",
-      "Source": "live",
-      "Smooth": true,
-      "Smoothwidth": 0.12,
-      "Simguests": 3,
-      "Simspeed": 0.7,
-      "Simspread": 0.22,
-      "Simgap": 6.0
-    },
-    "/master/osc_dispatch": {
-      "Posrate": 30,
-      "Sendpos": true
-    }
+ "_about": "настройки площадки мастера; пишется само при изменении, грузится при открытии",
+ "_saved": "2026-09-04 08:31:05",
+ "pars": {
+  "/master/show_control": {
+   "Panelport": 6001,
+   "Zonesport": 6002,
+   "Maxactive": 1,
+   "Gatezone": 3,
+   "Gatehold": 4.0,
+   "Pingtimeout": 6.0,
+   "Ackwait": 1.5,
+   "Ackretries": 3,
+   "Scenetimeout": 300.0,
+   "Exitgrace": 8.0,
+   "Assignmode": "pool",
+   "Autonext": true,
+   "Autostartzone1": true,
+   "Entryzone": 1,
+   "Btreport": 10.0,
+   "Btfrozen": 3.0,
+   "Logtofile": true,
+   "Ndi1": "",
+   "Ndi2": "",
+   "Ndi3": "",
+   "Ndi4": "",
+   "Ndi5": "",
+   "Ndion": false,
+   "Ndiscale": 0.25,
+   "Poszones": "3",
+   "Techsessions": true,
+   "Listenmax": 32,
+   "Scenelen1": 0,
+   "Scenelen2": 0,
+   "Scenelen3": 0,
+   "Scenelen4": 0,
+   "Defaultguests": 3,
+   "Defaultprompts": "1 2 3"
   },
-  "tables": {
-    "/master/osc_dispatch/slaves": [
-      [
-        "name",
-        "zone",
-        "ip",
-        "port",
-        "active"
-      ],
-      [
-        "zone1",
-        "1",
-        "10.10.10.11",
-        "6000",
-        "1"
-      ],
-      [
-        "zone2",
-        "2",
-        "10.10.10.12",
-        "6000",
-        "1"
-      ],
-      [
-        "zone3",
-        "3",
-        "10.10.10.13",
-        "6000",
-        "1"
-      ],
-      [
-        "zone4",
-        "4",
-        "10.10.10.14",
-        "6000",
-        "1"
-      ],
-      [
-        "panel",
-        "0",
-        "10.10.10.15",
-        "6003",
-        "1"
-      ]
-    ],
-    "/master/show_control/beacon_pools": [
-      [
-        "slot",
-        "beacons"
-      ],
-      [
-        "A",
-        "1,2,3"
-      ],
-      [
-        "B",
-        "4,5,6"
-      ]
-    ],
-    "/master/zones/zones_table": [
-      [
-        "zone",
-        "xmin",
-        "xmax",
-        "ymin",
-        "ymax"
-      ],
-      [
-        "1",
-        "11.250",
-        "15.000",
-        "0.0",
-        "3.000"
-      ],
-      [
-        "2",
-        "7.500",
-        "11.250",
-        "0.0",
-        "3.000"
-      ],
-      [
-        "3",
-        "3.750",
-        "7.500",
-        "0.0",
-        "3.000"
-      ],
-      [
-        "4",
-        "0.000",
-        "3.750",
-        "0.0",
-        "3.000"
-      ]
-    ]
+  "/master/zones": {
+   "Originx": -6.5,
+   "Originy": -1.5,
+   "Invertx": false,
+   "Inverty": false,
+   "Xchan": "tx",
+   "Ychan": "tz",
+   "Tunnellength": 15.0,
+   "Tunnelwidth": 3.0,
+   "Relorigin": "entry",
+   "Checkx": 11.25,
+   "Checky": 1.5,
+   "Calbeacon": 1,
+   "Zerox": 7.5,
+   "Zeroy": 3.0,
+   "Xrawa": 1.0,
+   "Xtuna": 7.5,
+   "Xrawb": 8.5,
+   "Xtunb": 15.0,
+   "Yrawa": 1.5,
+   "Ytuna": 3.0,
+   "Yrawb": -1.5,
+   "Ytunb": 0.0,
+   "Nudgestep": 0.5,
+   "Stalesec": 2.0
+  },
+  "/master/bt_input": {
+   "Port": 24002,
+   "Protocol": "msging",
+   "Netaddress": "239.0.0.1",
+   "Source": "live",
+   "Smooth": true,
+   "Smoothwidth": 0.12,
+   "Simguests": 3,
+   "Simspeed": 0.7,
+   "Simspread": 0.22,
+   "Simgap": 6.0
+  },
+  "/master/osc_dispatch": {
+   "Posrate": 30,
+   "Sendpos": true
   }
+ },
+ "tables": {
+  "/master/osc_dispatch/slaves": [
+   [
+    "name",
+    "zone",
+    "ip",
+    "port",
+    "active"
+   ],
+   [
+    "zone1",
+    "1",
+    "10.10.10.11",
+    "6000",
+    "1"
+   ],
+   [
+    "zone2",
+    "2",
+    "10.10.10.12",
+    "6000",
+    "1"
+   ],
+   [
+    "zone3",
+    "3",
+    "10.10.10.13",
+    "6000",
+    "1"
+   ],
+   [
+    "zone4",
+    "4",
+    "10.10.10.14",
+    "6000",
+    "1"
+   ],
+   [
+    "panel",
+    "0",
+    "10.10.10.15",
+    "6003",
+    "1"
+   ]
+  ],
+  "/master/show_control/beacon_pools": [
+   [
+    "slot",
+    "beacons"
+   ],
+   [
+    "A",
+    "1,2,3"
+   ],
+   [
+    "B",
+    "4,5,6"
+   ]
+  ],
+  "/master/zones/zones_table": [
+   [
+    "zone",
+    "xmin",
+    "xmax",
+    "ymin",
+    "ymax"
+   ],
+   [
+    "1",
+    "11.250",
+    "15.000",
+    "0.0",
+    "3.000"
+   ],
+   [
+    "2",
+    "7.500",
+    "11.250",
+    "0.0",
+    "3.000"
+   ],
+   [
+    "3",
+    "3.750",
+    "7.500",
+    "0.0",
+    "3.000"
+   ],
+   [
+    "4",
+    "0.000",
+    "3.750",
+    "0.0",
+    "3.000"
+   ]
+  ]
+ }
 }
