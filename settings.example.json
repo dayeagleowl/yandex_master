@@ -45,11 +45,20 @@
       "Tunnellength": 15.0,
       "Tunnelwidth": 3.0,
       "Relorigin": "entry",
-      "Checkx": 15.0,
-      "Checky": 0.0,
+      "Checkx": 11.25,
+      "Checky": 1.5,
       "Calbeacon": 1,
       "Zerox": 7.5,
-      "Zeroy": 3.0
+      "Zeroy": 3.0,
+      "Xrawa": 1.0,
+      "Xtuna": 7.5,
+      "Xrawb": 8.5,
+      "Xtunb": 15.0,
+      "Yrawa": 1.5,
+      "Ytuna": 3.0,
+      "Yrawb": -1.5,
+      "Ytunb": 0.0,
+      "Nudgestep": 0.5
     },
     "/master/bt_input": {
       "Port": 24002,
