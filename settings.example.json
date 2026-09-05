@@ -70,10 +70,7 @@
       "Simguests": 3,
       "Simspeed": 0.7,
       "Simspread": 0.22,
-      "Simgap": 6.0,
-      "Jumpguard": true,
-      "Maxspeed": 4.0,
-      "Jumphold": 0.5
+      "Simgap": 6.0
     },
     "/master/osc_dispatch": {
       "Posrate": 30,
