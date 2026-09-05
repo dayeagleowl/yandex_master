@@ -27,13 +27,15 @@
       "Ndi5": "",
       "Ndion": false,
       "Ndiscale": 0.25,
-      "Poszones": "3 4",
+      "Poszones": "3",
       "Techsessions": true,
       "Listenmax": 32,
       "Scenelen1": 0,
       "Scenelen2": 0,
       "Scenelen3": 0,
-      "Scenelen4": 0
+      "Scenelen4": 0,
+      "Defaultguests": 3,
+      "Defaultprompts": "1 2 3"
     },
     "/master/zones": {
       "Originx": -6.5,
