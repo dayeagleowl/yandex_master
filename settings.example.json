@@ -61,7 +61,15 @@
    "Yrawb": -1.5,
    "Ytunb": 0.0,
    "Nudgestep": 0.5,
-   "Stalesec": 2.0
+   "Stalesec": 2.0,
+   "Bxx": 1.123,
+   "Bxy": 0.0,
+   "Bxz": 0.072,
+   "Bx0": 5.687,
+   "Byx": -0.076,
+   "Byy": 0.0,
+   "Byz": 1.327,
+   "By0": 1.806
   },
   "/master/bt_input": {
    "Port": 24002,
